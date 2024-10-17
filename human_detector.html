@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Detector</title>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #video { margin-top: 20px; }
+        #result { margin-top: 20px; font-size: 24px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Human Detector</h1>
+    <video id="video" width="640" height="480" autoplay muted></video>
+    <div id="result">Initializing...</div>
+
+    <script>
+        const video = document.getElementById('video');
+        const result = document.getElementById('result');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        async function detectHuman() {
+            await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/');
+            
+            setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+                
+                if (detections.length > 0) {
+                    result.textContent = "Human detected!";
+                    result.style.color = "green";
+                } else {
+                    result.textContent = "No human detected";
+                    result.style.color = "red";
+                }
+            }, 100);
+        }
+
+        setupCamera().then(detectHuman);
+    </script>
+</body>
+</html>
